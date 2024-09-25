@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: giorgi023/projects:v1
+        env:
+        - name: SERVER_ID
+          value: "SERVER-1"
+        - name: DB_URI
+          valueFrom:
+            secretKeyRef:
+              name: db-uri-secret
+              key: uri
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  type: LoadBalancer  
+  selector:
+    app: web
+  ports:
+    - protocol: TCP
+      port: 80       
+      targetPort: 80 
+      nodePort: 30000
